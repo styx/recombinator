@@ -5,7 +5,8 @@ defmodule Sentence do
   """
 
   @doc """
-  Generates sequentials splits by format 'word(n)'
+  Generates sequentials splits by format 'word(n) \n word (n) + word(n)'
+  with any combination of \s and ?+ in places of spaces, \n and ?+.
 
   Example:
 
@@ -20,9 +21,9 @@ defmodule Sentence do
 
   """
 
-  @spec seq_split(String.t) :: [String.t]
-  def seq_split(encoded_string) do
-    pairs_list = String.split(encoded_string, ~r/[()+\s]/, trim: true)
+  @spec seq_split(String.t) :: [[String.t]]
+  def seq_split(sentence) do
+    pairs_list = String.split(sentence, ~r/[()+\s]/, trim: true)
     seq_split(pairs_list, [])
   end
 
@@ -32,6 +33,25 @@ defmodule Sentence do
       seq_split(
         [word |> Word.seq_split(String.to_integer(n)) | accumulator]
       )
+  end
+
+  @doc """
+
+  Example:
+
+  iex> Sentence.recombinate("новость(3) + рахит(2) + сгущенка(3) + изобилие(2)") |> hd
+  "новрасгуиз"
+
+  iex> Sentence.recombinate("новость(3) + рахит(2) + сгущенка(3) + изобилие(2)") |> List.last
+  "стьитнкаие"
+
+  iex> Sentence.recombinate("новость(3) + рахит(2) + сгущенка(3) + изобилие(2)") |> length
+  840
+  """
+
+  @spec recombinate(String.t) :: [String.t]
+  def recombinate(sentence) do
+    seq_split(sentence) |> Word.recombinate
   end
 
 end
