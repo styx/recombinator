@@ -5,26 +5,6 @@ defmodule Word do
   """
 
   @doc """
-  Generates sequentials splits by format 'word(n)'
-
-  Example:
-
-  iex> Word.parse_seq_split("канарейка(2)")
-  ["ка", "ан", "на", "ар", "ре", "ей", "йк", "ка"]
-
-  iex> Word.parse_seq_split("министр (3) ")
-  ["мин", "ини", "нис", "ист", "стр"]
-
-  """
-
-  @spec parse_seq_split(String.t) :: [String.t]
-  def parse_seq_split(encoded_string) do
-    [string, n] = String.split(encoded_string, ~r/[\(\s\)]/, trim: true)
-    string |> seq_split(String.to_integer(n))
-  end
-
-
-  @doc """
   Converts the word to the list of tokens
   of size n by sequential splitting on each
   char
