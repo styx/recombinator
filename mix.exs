@@ -5,7 +5,10 @@ defmodule Word.Mixfile do
     [app: :word,
      version: "0.0.1",
      elixir: "~> 1.0",
-     deps: deps]
+     deps: deps,
+     escript: [
+       main_module: Main
+     ]]
   end
 
   # Configuration for the OTP application
@@ -25,6 +28,8 @@ defmodule Word.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    []
+    [
+      {:ecto, "~> 0.2.4"}
+    ]
   end
 end
