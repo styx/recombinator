@@ -1,4 +1,6 @@
 defmodule Main do
+  require Logger
+
   @moduledoc """
   Main module
   """
@@ -8,9 +10,13 @@ defmodule Main do
   """
 
   def main(args) do
-    args
-    |> parse_args
-    |> process
+    try do
+      args
+      |> parse_args
+      |> process
+    rescue
+      e in FunctionClauseError -> Logger.warn("Invalid params format. Should be 'word(3) word(2)'")
+    end
   end
 
 
@@ -36,8 +42,6 @@ defmodule Main do
   def parse_args(args) do
     options = OptionParser.parse(args, switches: [help: :boolean], aliases: [h: :help])
 
-    IO.inspect options
-
     case options do
       {[help: true], _, _}         -> :help
       {[], [], []}                            -> :help
@@ -46,7 +50,7 @@ defmodule Main do
     end
   end
 
-  def process(:help) do
+  defp process(:help) do
     IO.puts """
       Usage:
         word 'some(3) words(2)'
@@ -63,7 +67,7 @@ defmodule Main do
     System.halt(0)
   end
 
-  def process(words) when is_binary(words) do
+  defp process(words) when is_binary(words) do
     words
     |> Sentence.recombinate
     |> Enum.join("\n")
