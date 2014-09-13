@@ -36,6 +36,7 @@ defmodule Sentence do
   end
 
   @doc """
+  Parses a sentence to words and count options and recombinates then
 
   Example:
 
