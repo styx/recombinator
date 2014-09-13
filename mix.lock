@@ -1,3 +1,6 @@
 %{"decimal": {:package, "0.2.5"},
+  "earmark": {:package, "0.1.10"},
   "ecto": {:package, "0.2.4"},
-  "poolboy": {:package, "1.2.1"}}
+  "ex_doc": {:package, "0.6.0"},
+  "poolboy": {:package, "1.2.1"},
+  "postgrex": {:package, "0.6.0"}}
