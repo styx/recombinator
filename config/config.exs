@@ -24,4 +24,5 @@ use Mix.Config
 import_config "#{Mix.env}.exs"
 
 config :recombinate,
-  db_path: "ecto://#{System.get_env("POSTGRES_LOGIN")}:#{System.get_env("POSTGRES_PASSWORD")}@localhost/#{Application.get_env(:recombinate, :db_name)}"
+  db_path: "ecto://#{System.get_env("POSTGRES_LOGIN")}:#{System.get_env("POSTGRES_PASSWORD")}@localhost/dictionary"
+

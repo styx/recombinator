@@ -3,5 +3,4 @@ use Mix.Config
 config :logger, :console,
   level: :debug
 
-config :recombinate,
-  db_name: "dictionary_#{Mix.env}"
+Application.put_env(:recombinate, :db_name, "dictionary_#{Mix.env}")
