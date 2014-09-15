@@ -15,7 +15,7 @@ defmodule Main do
       |> parse_args
       |> process
     rescue
-      e in FunctionClauseError -> Logger.warn("Invalid params format. Should be 'word(3) word(2)'")
+      _e in FunctionClauseError -> Logger.warn("Invalid params format. Should be 'word(3) word(2)'")
     end
   end
 
