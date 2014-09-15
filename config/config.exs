@@ -21,8 +21,7 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 
-config :recombinate,
-  postgres_login: System.get_env("POSTGRES_LOGIN"),
-  postgres_password: System.get_env("POSTGRES_PASSWORD")
-
 import_config "#{Mix.env}.exs"
+
+config :recombinate,
+  db_path: "ecto://#{System.get_env("POSTGRES_LOGIN")}:#{System.get_env("POSTGRES_PASSWORD")}@localhost/#{Application.get_env(:recombinate, :db_name)}"

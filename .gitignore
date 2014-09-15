@@ -4,3 +4,6 @@ erl_crash.dump
 *.ez
 /recombinate
 /docs
+/config/dev.exs
+/config/prod.exs
+/config/test.exs

@@ -2,3 +2,6 @@ use Mix.Config
 
 config :logger, :console,
   level: :info
+
+config :recombinate,
+  db_name: "dictionary_#{Mix.env}"
