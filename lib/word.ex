@@ -112,4 +112,20 @@ defmodule Word do
     [{[],al} | (for {bs, cs} <- splits(as), do: {[a|bs],cs})]
   end
 
+  @doc """
+  Sorts word chars
+
+  Example:
+
+  iex> Word.sort("гбв")
+  "бвг"
+  """
+
+  def sort(word) when is_binary(word) do
+    word
+    |> to_char_list
+    |> Enum.sort
+    |> to_string
+  end
+
 end
