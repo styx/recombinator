@@ -25,4 +25,16 @@ defmodule DictionaryQueries do
     Repo.all(query)
   end
 
+  def insert_word(word, info) do
+    word    = word |> String.downcase
+    anagram = word |> Word.sort
+
+    unless word_exists?(word) do
+      word = %Dictionary{word: word, info: info, anagram: anagram}
+      |> Repo.insert
+      {:ok, word}
+    else
+      :exists
+    end
+  end
 end

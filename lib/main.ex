@@ -56,6 +56,12 @@ defmodule Main do
   iex> Main.parse_args(["--anagram", "аканарейк"])
   {:anagram, "аканарейк"}
 
+  iex> Main.parse_args(["--insert", "new_word"])
+  {:insert, "new_word", ""}
+
+  iex> Main.parse_args(["-i", "new_word", "some_info"])
+  {:insert, "new_word", "some_info"}
+
   """
 
   @spec parse_args([String.t]) :: none
@@ -65,11 +71,13 @@ defmodule Main do
         help: :boolean,
         anagram: :boolean,
         dismemberment: :boolean,
+        insert: :boolean
       ],
       aliases: [
         h: :help,
         a: :anagram,
-        d: :dismemberment
+        d: :dismemberment,
+        i: :insert
       ]
     )
 
@@ -77,6 +85,8 @@ defmodule Main do
       {[help: true], _, _}                            -> :help
       {[anagram: true], [word], _}                    -> {:anagram, word}
       {[dismemberment: true], words, []}              -> {:dismemberment, words |> Enum.join(" ")}
+      {[insert: true], [word], []}                    -> {:insert, word, ""}
+      {[insert: true], [word, info], []}              -> {:insert, word, info}
       _                                               -> :help
     end
   end
@@ -105,6 +115,11 @@ defmodule Main do
             Recombinates word chars and checks them for validity
             throught database
 
+        -i, [--insert]             # Inserts new word with some info
+          'word' 'some info'
+
+          Description:
+            Inserts new word if it's not present in DB else shows a warning
     """
     System.halt(0)
   end
@@ -120,6 +135,14 @@ defmodule Main do
     word
     |> Word.sort
     |> DictionaryQueries.anagrams
+  end
+
+  defp process({:insert, word, info}) do
+    case DictionaryQueries.insert_word(word, info) do
+      {:ok, _} -> Logger.info("Insertion finished successfully")
+      :exists  -> Logger.warn("Word already exists. Update it's info instead")
+    end
+    []
   end
 
 end
