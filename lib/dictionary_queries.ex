@@ -25,6 +25,14 @@ defmodule DictionaryQueries do
     Repo.all(query)
   end
 
+  def find_words(word) do
+    query = from d in Dictionary,
+         select: d,
+         where: ilike(d.word, ^word)
+
+    Repo.all(query)
+  end
+
   def insert_word(word, info) do
     word    = word |> String.downcase
     anagram = word |> Word.sort

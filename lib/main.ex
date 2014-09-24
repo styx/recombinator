@@ -71,13 +71,15 @@ defmodule Main do
         help: :boolean,
         anagram: :boolean,
         dismemberment: :boolean,
-        insert: :boolean
+        insert: :boolean,
+        find: :boolean
       ],
       aliases: [
         h: :help,
         a: :anagram,
         d: :dismemberment,
-        i: :insert
+        i: :insert,
+        f: :find
       ]
     )
 
@@ -87,6 +89,7 @@ defmodule Main do
       {[dismemberment: true], words, []}              -> {:dismemberment, words |> Enum.join(" ")}
       {[insert: true], [word], []}                    -> {:insert, word, ""}
       {[insert: true], [word, info], []}              -> {:insert, word, info}
+      {[find: true], [word], []}                      -> {:find, word}
       _                                               -> :help
     end
   end
@@ -110,7 +113,8 @@ defmodule Main do
             `()` are also can be replaced with `+` or space
 
         -a, [--anagram]            # Generates possible anagrams and
-                                   # and filters throught Dictionary
+            'word'                 # and filters throught Dictionary
+
           Description:
             Recombinates word chars and checks them for validity
             throught database
@@ -120,6 +124,12 @@ defmodule Main do
 
           Description:
             Inserts new word if it's not present in DB else shows a warning
+
+        -f, [--find]               # Finds the word by pattern and shows info
+          'word'
+
+          Description:
+            Inserts new word if it's not present in DB else shows the warning
     """
     System.halt(0)
   end
@@ -145,4 +155,10 @@ defmodule Main do
     []
   end
 
+  defp process({:find, word}) do
+    word
+    |> String.downcase
+    |> DictionaryQueries.find_words
+    |> Stream.map(fn(word) -> "#{word.word}\t#{word.info}" end)
+  end
 end
