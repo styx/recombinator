@@ -63,6 +63,12 @@ defmodule Main do
 
   iex> Main.parse_args(["-r", "word"])
   {:remove, "word"}
+
+  iex> Main.parse_args(["-l", "ксения"])
+  {:logogrif, "ксения"}
+
+  iex> Main.parse_args(["--logogrif", "кения"])
+  {:logogrif, "кения"}
   """
 
   @spec parse_args([String.t]) :: none
@@ -72,6 +78,7 @@ defmodule Main do
         help: :boolean,
         anagram: :boolean,
         dismemberment: :boolean,
+        logogrif: :boolean,
         insert: :boolean,
         find: :boolean,
         remove: :boolean
@@ -80,6 +87,7 @@ defmodule Main do
         h: :help,
         a: :anagram,
         d: :dismemberment,
+        l: :logogrif,
         i: :insert,
         f: :find,
         r: :remove
@@ -90,6 +98,7 @@ defmodule Main do
       {[help: true], _, _}                            -> :help
       {[anagram: true], [word], _}                    -> {:anagram, word}
       {[dismemberment: true], words, []}              -> {:dismemberment, words |> Enum.join(" ")}
+      {[logogrif: true], [word], []}                  -> {:logogrif, word}
       {[insert: true], [word], []}                    -> {:insert, word, ""}
       {[insert: true], [word, info], []}              -> {:insert, word, info}
       {[find: true], [word], []}                      -> {:find, word}
@@ -123,6 +132,9 @@ defmodule Main do
             `+` is allowed in place of spaces
             `()` are also can be replaced with `+` or space
 
+        -l, [--logogrif]           # Builds logogrifos and checks
+            'word'                 # Through dictionary
+
         -i, [--insert]             # Inserts new word with some info
           'word' 'some info'
 
@@ -145,7 +157,7 @@ defmodule Main do
     words
     |> Sentence.recombinate
     |> Stream.uniq
-    |> Stream.filter(fn(x) -> DictionaryQueries.word_exists?(x) end)
+    |> Stream.filter(&DictionaryQueries.word_exists?/1)
     |> print_list
   end
 
@@ -153,6 +165,16 @@ defmodule Main do
     word
     |> Word.sort
     |> DictionaryQueries.anagrams
+    |> Stream.uniq
+    |> print_list
+  end
+
+  defp process({:logogrif, word}) do
+    word
+    |> Word.logogrif
+    |> Stream.flat_map(&DictionaryQueries.find_words/1)
+    |> Stream.filter(fn(dict_word) -> dict_word != word end)
+    |> Stream.uniq
     |> print_list
   end
 

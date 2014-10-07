@@ -141,4 +141,29 @@ defmodule Word do
   def pp(word) do
     "#{word.id}\t#{word.word}\t#{word.info}"
   end
+
+  @doc """
+  Generates logogrif patterns
+
+  Example:
+  iex> Word.logogrif("перу") |> Enum.to_list
+  ["_перу", "перу_", "пер", "пер_", "пеу", "пе_у", "пру", "п_ру", "еру", "_еру"]
+  """
+
+  @spec logogrif(String.t) :: [String.t]
+  def logogrif(<<>>), do: []
+  def logogrif(word) when is_binary(word) do
+    word
+    |> to_char_list
+    |> logogrif([], [])
+    |> Stream.map(&to_string/1)
+  end
+
+  defp logogrif([], word, acc), do: ['_' ++ word, word ++ '_' | acc]
+  defp logogrif([h | t], pref, acc) do
+    a = pref ++ t
+    b = pref ++ '_' ++ t
+    logogrif(t, pref ++ [h], [a, b | acc])
+  end
+
 end
