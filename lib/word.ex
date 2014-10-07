@@ -166,4 +166,26 @@ defmodule Word do
     logogrif(t, pref ++ [h], [a, b | acc])
   end
 
+  @doc """
+  Generates metagram patterns
+
+  Example:
+  iex> Word.metagram("барокко") |> Enum.to_list
+  ["барокк_", "барок_о", "баро_ко", "бар_кко", "ба_окко", "б_рокко", "_арокко"]
+  """
+
+  @spec metagram(String.t) :: [String.t]
+  def metagram(<<>>), do: []
+  def metagram(word) when is_binary(word) do
+    word
+    |> to_char_list
+    |> metagram([], [])
+    |> Stream.map(&to_string/1)
+  end
+
+  defp metagram([], word, acc), do: acc
+  defp metagram([h | t], pref, acc) do
+    a = pref ++ '_' ++ t
+    metagram(t, pref ++ [h], [a | acc])
+  end
 end

@@ -69,6 +69,13 @@ defmodule Main do
 
   iex> Main.parse_args(["--logogrif", "кения"])
   {:logogrif, "кения"}
+
+  iex> Main.parse_args(["-m", "барокко"])
+  {:metagram, "барокко"}
+
+  iex> Main.parse_args(["--metagram", "марокко"])
+  {:metagram, "марокко"}
+
   """
 
   @spec parse_args([String.t]) :: none
@@ -79,6 +86,7 @@ defmodule Main do
         anagram: :boolean,
         dismemberment: :boolean,
         logogrif: :boolean,
+        metagram: :boolean,
         insert: :boolean,
         find: :boolean,
         remove: :boolean
@@ -88,6 +96,7 @@ defmodule Main do
         a: :anagram,
         d: :dismemberment,
         l: :logogrif,
+        m: :metagram,
         i: :insert,
         f: :find,
         r: :remove
@@ -99,6 +108,7 @@ defmodule Main do
       {[anagram: true], [word], _}                    -> {:anagram, word}
       {[dismemberment: true], words, []}              -> {:dismemberment, words |> Enum.join(" ")}
       {[logogrif: true], [word], []}                  -> {:logogrif, word}
+      {[metagram: true], [word], []}                  -> {:metagram, word}
       {[insert: true], [word], []}                    -> {:insert, word, ""}
       {[insert: true], [word, info], []}              -> {:insert, word, info}
       {[find: true], [word], []}                      -> {:find, word}
@@ -133,7 +143,10 @@ defmodule Main do
             `()` are also can be replaced with `+` or space
 
         -l, [--logogrif]           # Builds logogrifos and checks
-            'word'                 # Through dictionary
+            'word'                 # through dictionary
+
+        -m, [--metagram]           # Builds metagrams and checks
+            'word'                 # through dictionary
 
         -i, [--insert]             # Inserts new word with some info
           'word' 'some info'
@@ -172,10 +185,13 @@ defmodule Main do
   defp process({:logogrif, word}) do
     word
     |> Word.logogrif
-    |> Stream.flat_map(&DictionaryQueries.find_words/1)
-    |> Stream.filter(fn(dict_word) -> dict_word != word end)
-    |> Stream.uniq
-    |> print_list
+    |> find_by_and_print(word)
+  end
+
+  defp process({:metagram, word}) do
+    word
+    |> Word.metagram
+    |> find_by_and_print(word)
   end
 
   defp process({:find, word}) do
@@ -196,6 +212,16 @@ defmodule Main do
     process({:find, word})
     IO.gets "Enter ID for removal: "
     Logger.error "Not implemented yet"
+  end
+
+  defp find_by_and_print(patterns, word) do
+    patterns
+    |> Stream.flat_map(&DictionaryQueries.find_words/1)
+    |> Stream.map(&to_string/1)
+    |> Stream.filter(fn(dict_word) -> dict_word != word end)
+    |> Stream.uniq
+    |> Stream.map(fn(dict_word) -> "#{word} #{dict_word}" end)
+    |> print_list
   end
 
   defp print_list(list) do
