@@ -7,3 +7,4 @@ erl_crash.dump
 /config/dev.exs
 /config/prod.exs
 /config/test.exs
+.mix_tasks
