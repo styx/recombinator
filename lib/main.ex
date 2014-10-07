@@ -15,10 +15,9 @@ defmodule Main do
 
     try do
       args
+      |> Enum.map(&String.downcase/1)
       |> parse_args
       |> process
-      |> Enum.join("\n")
-      |> IO.puts
     rescue
       _e in FunctionClauseError -> process(:help)
     end
@@ -62,6 +61,8 @@ defmodule Main do
   iex> Main.parse_args(["-i", "new_word", "some_info"])
   {:insert, "new_word", "some_info"}
 
+  iex> Main.parse_args(["-r", "word"])
+  {:remove, "word"}
   """
 
   @spec parse_args([String.t]) :: none
@@ -72,14 +73,16 @@ defmodule Main do
         anagram: :boolean,
         dismemberment: :boolean,
         insert: :boolean,
-        find: :boolean
+        find: :boolean,
+        remove: :boolean
       ],
       aliases: [
         h: :help,
         a: :anagram,
         d: :dismemberment,
         i: :insert,
-        f: :find
+        f: :find,
+        r: :remove
       ]
     )
 
@@ -90,6 +93,7 @@ defmodule Main do
       {[insert: true], [word], []}                    -> {:insert, word, ""}
       {[insert: true], [word, info], []}              -> {:insert, word, info}
       {[find: true], [word], []}                      -> {:find, word}
+      {[remove: true], [word], []}                    -> {:remove, word}
       _                                               -> :help
     end
   end
@@ -102,6 +106,13 @@ defmodule Main do
       Options:
         -h, [--help]               # Show this help message and quit.
 
+        -a, [--anagram]            # Generates possible anagrams and
+            'word'                 # and filters throught Dictionary
+
+          Description:
+            Recombinates word chars and checks them for validity
+            throught database
+
         -d, [--dismemberment]      # Builds a words by dismemberment
             'some(3) words(2)'     # alghorithm and filters through
                                    # Dictionary
@@ -112,13 +123,6 @@ defmodule Main do
             `+` is allowed in place of spaces
             `()` are also can be replaced with `+` or space
 
-        -a, [--anagram]            # Generates possible anagrams and
-            'word'                 # and filters throught Dictionary
-
-          Description:
-            Recombinates word chars and checks them for validity
-            throught database
-
         -i, [--insert]             # Inserts new word with some info
           'word' 'some info'
 
@@ -128,8 +132,11 @@ defmodule Main do
         -f, [--find]               # Finds the word by pattern and shows info
           'word'
 
+        -r, [--remove]             # Removes the word and shows what was removed
+          'word'
+
           Description:
-            Inserts new word if it's not present in DB else shows the warning
+            Removes a word by ID
     """
     System.halt(0)
   end
@@ -139,12 +146,21 @@ defmodule Main do
     |> Sentence.recombinate
     |> Stream.uniq
     |> Stream.filter(fn(x) -> DictionaryQueries.word_exists?(x) end)
+    |> print_list
   end
 
   defp process({:anagram, word}) do
     word
     |> Word.sort
     |> DictionaryQueries.anagrams
+    |> print_list
+  end
+
+  defp process({:find, word}) do
+    word
+    |> DictionaryQueries.find_words
+    |> Stream.map(&Word.pp/1)
+    |> print_list
   end
 
   defp process({:insert, word, info}) do
@@ -152,13 +168,16 @@ defmodule Main do
       {:ok, _} -> Logger.info("Insertion finished successfully")
       :exists  -> Logger.warn("Word already exists. Update it's info instead")
     end
-    []
   end
 
-  defp process({:find, word}) do
-    word
-    |> String.downcase
-    |> DictionaryQueries.find_words
-    |> Stream.map(fn(word) -> "#{word.word}\t#{word.info}" end)
+  defp process({:remove, word}) do
+    process({:find, word})
+    IO.gets "Enter ID for removal: "
+    Logger.error "Not implemented yet"
   end
+
+  defp print_list(list) do
+    Enum.each(list, &IO.puts/1)
+  end
+
 end

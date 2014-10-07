@@ -128,4 +128,17 @@ defmodule Word do
     |> to_string
   end
 
+  @doc """
+  Pretty printer
+
+  Example:
+
+  iex> Word.pp(%Dictionary{id: 1, word: "test", info: "info", anagram: "estt"})
+  "1\ttest\tinfo"
+  """
+
+  @spec pp(Dictionary.t) :: String.t
+  def pp(word) do
+    "#{word.id}\t#{word.word}\t#{word.info}"
+  end
 end
