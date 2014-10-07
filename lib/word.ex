@@ -147,7 +147,7 @@ defmodule Word do
 
   Example:
   iex> Word.logogrif("перу") |> Enum.to_list
-  ["_перу", "перу_", "пер", "пер_", "пеу", "пе_у", "пру", "п_ру", "еру", "_еру"]
+  ["_перу", "пер", "перу_", "пеу", "пер_у", "пру", "пе_ру", "еру", "п_еру"]
   """
 
   @spec logogrif(String.t) :: [String.t]
@@ -159,10 +159,10 @@ defmodule Word do
     |> Stream.map(&to_string/1)
   end
 
-  defp logogrif([], word, acc), do: ['_' ++ word, word ++ '_' | acc]
+  defp logogrif([], word, acc), do: ['_' ++ word | acc]
   defp logogrif([h | t], pref, acc) do
     a = pref ++ t
-    b = pref ++ '_' ++ t
+    b = pref ++ [h | '_'] ++ t
     logogrif(t, pref ++ [h], [a, b | acc])
   end
 
