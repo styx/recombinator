@@ -8,3 +8,9 @@ defmodule Dictionary do
   end
 
 end
+
+defimpl String.Chars, for: Dictionary do
+  def to_string(word) do
+    word.word
+  end
+end
