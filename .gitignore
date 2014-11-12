@@ -8,3 +8,4 @@ erl_crash.dump
 /config/prod.exs
 /config/test.exs
 .mix_tasks
+tags
