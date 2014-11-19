@@ -117,7 +117,7 @@ defmodule Main do
     end
   end
 
-  @spec process([String.t] | atom) :: none
+  @spec process({atom, String.t} | atom) :: none
   defp process(:help) do
     IO.puts """
       Usage:
