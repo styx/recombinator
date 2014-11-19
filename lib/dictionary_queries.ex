@@ -33,6 +33,14 @@ defmodule DictionaryQueries do
     Repo.all(query)
   end
 
+  def find_all(patterns, word) do
+    patterns
+    |> Stream.flat_map(&find_words/1)
+    |> Stream.map(&to_string/1)
+    |> Stream.filter(fn(dict_word) -> dict_word != word end)
+    |> Stream.uniq
+  end
+
   def insert_word(word, info) do
     word    = word |> String.downcase
     anagram = word |> Word.sort

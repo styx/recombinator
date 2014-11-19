@@ -9,7 +9,7 @@ defmodule Main do
   Main function (:
   """
 
-  @spec main([String.t]) :: none
+  @spec main(OptionParser.argv) :: none
   def main(args) do
     init
 
@@ -78,7 +78,7 @@ defmodule Main do
 
   """
 
-  @spec parse_args([String.t]) :: none
+  @spec parse_args(OptionParser.argv) :: none
   def parse_args(args) do
     options = OptionParser.parse(args,
       switches: [
@@ -171,7 +171,7 @@ defmodule Main do
     |> Sentence.recombinate
     |> Stream.uniq
     |> Stream.filter(&DictionaryQueries.word_exists?/1)
-    |> print_list
+    |> PP.print_list
   end
 
   defp process({:anagram, word}) do
@@ -179,26 +179,28 @@ defmodule Main do
     |> Word.sort
     |> DictionaryQueries.anagrams
     |> Stream.uniq
-    |> print_list
+    |> PP.print_list
   end
 
   defp process({:logogrif, word}) do
     word
     |> Word.logogrif
-    |> find_by_and_print(word)
+    |> DictionaryQueries.find_all(word)
+    |> PP.print_words_pairs(word)
   end
 
   defp process({:metagram, word}) do
     word
     |> Word.metagram
-    |> find_by_and_print(word)
+    |> DictionaryQueries.find_all(word)
+    |> PP.print_words_pairs(word)
   end
 
   defp process({:find, word}) do
     word
     |> DictionaryQueries.find_words
     |> Stream.map(&Word.pp/1)
-    |> print_list
+    |> PP.print_list
   end
 
   defp process({:insert, word, info}) do
@@ -209,23 +211,20 @@ defmodule Main do
   end
 
   defp process({:remove, word}) do
-    process({:find, word})
-    IO.gets "Enter ID for removal: "
-    Logger.error "Not implemented yet"
+    word
+    |> DictionaryQueries.find_words
+    |> Stream.map(&Word.pp/1)
+    |> Stream.with_index
+    |> Enum.into(%{}, fn {word, n} -> {n, word} end)
+    |> remove_cycle
   end
 
-  defp find_by_and_print(patterns, word) do
-    patterns
-    |> Stream.flat_map(&DictionaryQueries.find_words/1)
-    |> Stream.map(&to_string/1)
-    |> Stream.filter(fn(dict_word) -> dict_word != word end)
-    |> Stream.uniq
-    |> Stream.map(fn(dict_word) -> "#{word} #{dict_word}" end)
-    |> print_list
-  end
-
-  defp print_list(list) do
-    Enum.each(list, &IO.puts/1)
+  defp remove_cycle(words) do
+    if Dict.size(words) > 0 do
+      words
+      |> Dict.delete(words |> PP.select_word_prompt("Enter ID for removal: "))
+      |> remove_cycle
+    end
   end
 
 end
