@@ -6,7 +6,6 @@ defmodule Dictionary do
     field :info,    :string
     field :anagram, :string
   end
-
 end
 
 defimpl String.Chars, for: Dictionary do
