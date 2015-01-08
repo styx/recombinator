@@ -5,6 +5,19 @@ defmodule Sentence do
   """
 
   @doc """
+  Trims and splits a sentece by whitespaces to words list
+
+  Example:
+
+  iex> Sentence.to_words_list("xxx yyy zzz")
+  ["xxx", "yyy", "zzz"]
+  """
+
+  def to_words_list(sentence) do
+    String.split(sentence, ~r/[()+\s]/, trim: true)
+  end
+
+  @doc """
   Generates sequentials splits by format 'word(n) \n word (n) + word(n)'
   with any combination of \s and ?+ in places of spaces, \n and ?+.
 
@@ -23,7 +36,7 @@ defmodule Sentence do
 
   @spec seq_split(String.t) :: [[String.t]]
   def seq_split(sentence) do
-    pairs_list = String.split(sentence, ~r/[()+\s]/, trim: true)
+    pairs_list = sentence |> to_words_list
     seq_split(pairs_list, [])
   end
 
