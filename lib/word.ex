@@ -6,7 +6,7 @@ defmodule Word do
 
   @doc """
   Converts the word to the list of tokens
-  of size n by sequential splitting on each
+  of size start by sequential splitting on each
   char
 
   Example:
@@ -26,24 +26,24 @@ defmodule Word do
   """
 
   @spec seq_split(String.t, integer) :: [String.t]
-  def seq_split(string, n) do
-    if (string |> String.length) >= n do
-      seq_split(string |> to_char_list, n, [])
+  def seq_split(string, start) do
+    if (string |> String.length) >= start do
+      seq_split(string |> to_char_list, start, [])
     else
       []
     end
   end
 
   defp seq_split([], _, acc), do: acc |> Enum.reverse
-  defp seq_split(chars, n, acc) do
+  defp seq_split(chars, start, acc) do
     len = chars |> length
     cond do
-      len == n ->
-        seq_split([], n, [chars |> to_string | acc])
+      len == start ->
+        seq_split([], start, [chars |> to_string | acc])
       true ->
         tail = chars |> Enum.drop(1)
-        chunk = chars |> Enum.take(n) |> to_string
-        seq_split(tail, n, [chunk | acc])
+        chunk = chars |> Enum.take(start) |> to_string
+        seq_split(tail, start, [chunk | acc])
     end
   end
 
@@ -95,7 +95,7 @@ defmodule Word do
   def permute(<<>>), do: []
   def permute(binary) when is_binary(binary) do
     binary
-    |> String.to_char_list
+    |> to_char_list
     |> permute
     |> Enum.map(&List.to_string/1)
   end
@@ -183,9 +183,74 @@ defmodule Word do
     |> Stream.map(&to_string/1)
   end
 
-  defp metagram([], word, acc), do: acc
+  defp metagram([], _word, acc), do: acc
   defp metagram([h | t], pref, acc) do
     a = pref ++ '_' ++ t
     metagram(t, pref ++ [h], [a | acc])
   end
+
+
+  @doc """
+  Generate corridors by words list
+
+  Example:
+
+  iex> Word.generate_corridors(["qwert", "yuiop", "asdfg"])
+  #HashSet<["qiop", "yuit", "yert", "ydfg", "qwop", "aiop", "qweg", "yurt", "qwfg", "qwep", "aert", "yufg", "asdp", "asdt", "qdfg", "asop", "asrt", "yuig"]>
+
+  iex> Word.generate_corridors(["word11", "wword1"])
+  #HashSet<["wwod11", "wwor11", "wordd1", "woord1", "wwrd11", "word1", "worrd1"]>
+
+  iex> words = Word.generate_corridors(["стилобат", "омлет"])
+  iex> Set.member?(words, "стилет")
+  true
+
+  """
+
+  @corridor_length 6
+  @spec generate_corridors([String.t]) :: [String.t]
+  def generate_corridors(words) do
+    original_words = Enum.into(words, HashSet.new)
+
+    generated_words = generate_pairs(words, [])
+    |> Enum.map(&generate_corridor/1)
+    |> List.flatten
+    |> Enum.into(HashSet.new)
+
+    Set.difference(generated_words, original_words)
+  end
+
+  defp generate_corridor(word1word2) do
+    generate_corridor(word1word2, 1, String.length(word1word2), [])
+  end
+
+  defp generate_corridor(_word1word2, start, list_length, acc)
+  when start + @corridor_length == list_length, do: acc
+
+  defp generate_corridor(word1word2, start, list_length, acc) do
+    new_corridor = word1word2 |> crop(start, list_length, @corridor_length)
+    generate_corridor(word1word2, start + 1, list_length, [new_corridor | acc])
+  end
+
+  defp generate_pairs([], acc), do: acc
+  defp generate_pairs([word | list], acc) do
+    new_words = Enum.map(list, &([word <> &1, &1 <> word])) |> List.flatten
+    generate_pairs(
+      list,
+      new_words ++ acc
+    )
+  end
+
+  defp crop(str, start, list_length, count) do
+    range1 = String.slice(str, 0, start)
+    range2 = String.slice(str, start + count, list_length)
+
+    {boundary_char, rest_of_range2} = String.next_codepoint(range2)
+
+    case String.ends_with?(range1, boundary_char) do
+      true -> [range1 <> range2, range1 <> rest_of_range2]
+      false -> range1 <> range2
+    end
+  end
+
 end

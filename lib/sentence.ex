@@ -5,11 +5,12 @@ defmodule Sentence do
   """
 
   @doc """
-  Trims and splits a sentece by whitespaces to words list
+  Trims and splits a sentece by whitespaces, () and +
+  to the words list
 
   Example:
 
-  iex> Sentence.to_words_list("xxx yyy zzz")
+  iex> Sentence.to_words_list("(xxx)yyy+zzz")
   ["xxx", "yyy", "zzz"]
   """
 
@@ -66,6 +67,16 @@ defmodule Sentence do
   @spec recombinate(String.t) :: [String.t]
   def recombinate(sentence) do
     seq_split(sentence) |> Word.recombinate
+  end
+
+  @doc """
+  Generates corridors see Word.generate_corridors/1
+  """
+
+  def generate_corridors(sentence) do
+    sentence
+    |> Sentence.to_words_list
+    |> Word.generate_corridors
   end
 
 end

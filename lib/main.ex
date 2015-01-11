@@ -76,6 +76,12 @@ defmodule Main do
   iex> Main.parse_args(["--metagram", "марокко"])
   {:metagram, "марокко"}
 
+  iex> Main.parse_args(["-c", "скальп тренер"])
+  {:corridor, "скальп тренер"}
+
+  iex> Main.parse_args(["--corridor", "скальп тренер"])
+  {:corridor, "скальп тренер"}
+
   """
 
   @spec parse_args(OptionParser.argv) :: none
@@ -89,7 +95,8 @@ defmodule Main do
         metagram: :boolean,
         insert: :boolean,
         find: :boolean,
-        remove: :boolean
+        remove: :boolean,
+        corridor: :boolean
       ],
       aliases: [
         h: :help,
@@ -99,7 +106,8 @@ defmodule Main do
         m: :metagram,
         i: :insert,
         f: :find,
-        r: :remove
+        r: :remove,
+        c: :corridor
       ]
     )
 
@@ -113,6 +121,7 @@ defmodule Main do
       {[insert: true], [word, info], []}              -> {:insert, word, info}
       {[find: true], [word], []}                      -> {:find, word}
       {[remove: true], [word], []}                    -> {:remove, word}
+      {[corridor: true], words, []}                   -> {:corridor, words |> Enum.join(" ")}
       _                                               -> :help
     end
   end
@@ -147,6 +156,9 @@ defmodule Main do
 
         -m, [--metagram]           # Builds metagrams and checks
             'word'                 # through dictionary
+
+        -c, [--corridor]           # Builds corridors and checks
+            'word1 word2 word3'    # through dictionary
 
         -i, [--insert]             # Inserts new word with some info
           'word' 'some info'
@@ -208,6 +220,16 @@ defmodule Main do
       {:ok, _} -> Logger.info("Insertion finished successfully")
       :exists  -> Logger.warn("Word already exists. Update it's info instead")
     end
+  end
+
+  defp process({:corridor, words}) do
+    words
+    |> Sentence.generate_corridors
+    |> Stream.uniq
+    |> Stream.filter(&(String.length(&1) > 3))
+    |> Stream.filter(&DictionaryQueries.word_exists?/1)
+    |> Enum.sort(&(String.length(&2) > String.length(&1)))
+    |> PP.print_list
   end
 
   defp process({:remove, word}) do
