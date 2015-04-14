@@ -9,3 +9,4 @@ erl_crash.dump
 /config/test.exs
 .mix_tasks
 tags
+*.csv
