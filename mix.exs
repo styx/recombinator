@@ -43,7 +43,7 @@ defmodule Word.Mixfile do
       {:ex_doc, "~> 0.6", only: :dev},
       {:mock, "~> 0.1", only: :test},
       {:postgrex, ">= 0.0.0"},
-      {:ecto, "~> 0.2.5"}
+      {:ecto, "~> 0.10"}
     ]
   end
 end
