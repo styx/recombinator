@@ -11,8 +11,6 @@ defmodule Main do
 
   @spec main(OptionParser.argv) :: none
   def main(args) do
-    init
-
     try do
       args
       |> Enum.map(&String.downcase/1)
@@ -22,15 +20,6 @@ defmodule Main do
       _e in FunctionClauseError -> process(:help)
     end
   end
-
-  @spec init :: none
-  defp init do
-    import Supervisor.Spec
-    tree = [worker(Repo, [])]
-    opts = [name: Simple.Sup, strategy: :one_for_one]
-    Supervisor.start_link(tree, opts)
-  end
-
 
   @doc """
   Parses function arguments

@@ -21,8 +21,12 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 
+config :recombinate, Repo,
+  adapter: Ecto.Adapters.Postgres,
+  database: "dictionary_#{Mix.env}",
+  username: System.get_env("POSTGRES_LOGIN"),
+  password: System.get_env("POSTGRES_PASSWORD"),
+  hostname: "localhost",
+  priv: "priv"
+
 import_config "#{Mix.env}.exs"
-
-config :recombinate,
-  db_path: "ecto://#{System.get_env("POSTGRES_LOGIN")}:#{System.get_env("POSTGRES_PASSWORD")}@localhost/dictionary"
-
