@@ -9,6 +9,8 @@ defmodule Word.Mixfile do
      source_url: "https://github.com/styx/recombinate",
      homepage_url: "https://github.com/styx/recombinate",
      deps: deps,
+     build_embedded: Mix.env == :prod,
+     start_permanent: Mix.env == :prod,
      escript: escript
    ]
   end
