@@ -37,9 +37,9 @@ defmodule Word.Mixfile do
     [
       {:earmark, "~> 0.1", only: :dev},
       {:ex_doc, "~> 0.6", only: :dev},
-      {:mock, "~> 0.1", only: :test},
+      {:mock, "~> 0.1.1", only: :test},
       {:postgrex, ">= 0.0.0"},
-      {:ecto, "~> 0.10"}
+      {:ecto, "~> 1.0.1"}
     ]
   end
 end
